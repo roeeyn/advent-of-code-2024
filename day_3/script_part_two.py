@@ -5,9 +5,9 @@ content = file.read()
 lines = content.split("\n")
 
 result = 0
+enabled = True
 
 for line in lines:
-    enabled = True
     for match in re.findall(r"mul\(\d{1,3},\d{1,3}\)|do\(\)|don't\(\)", line):
         if match == "do()":
             enabled = True

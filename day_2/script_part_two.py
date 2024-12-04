@@ -1,41 +1,54 @@
-with open("./input.txt", "r") as file:
-    content = file.read()
+def is_safe(report):
+    # Determine direction
+    direction = None
+    for i in range(len(report) - 1):
+        if report[i] < report[i + 1]:
+            direction = "inc"
+            break
+        elif report[i] > report[i + 1]:
+            direction = "dec"
+            break
 
-reports = [
-    [int(num) for num in line.split(" ")] for line in content.split("\n") if line != ""
-]
+    if direction is None:
+        # No differing elements; all are equal or single element
+        # Equal elements mean no valid "increasing" or "decreasing" trend
+        return False
 
-safe_reports = 0
-
-for report in reports:
-    is_safe = True
-    prev_el = report[0]
-    idx = 1
-    is_descending = None
-    bad_levels = 0
-    while is_safe and idx < len(report):
-        curr_el = report[idx]
-        diff = curr_el - prev_el
-        abs_diff = abs(diff)
-        invalid_diff = diff == 0 or abs_diff > 3
-        invalid_desc_sort = diff < 0 and is_descending == False
-        invalid_asc_sort = diff > 0 and is_descending == True
-        if invalid_diff or invalid_desc_sort or invalid_asc_sort:
-            if bad_levels == 0:
-                bad_levels += 1
-            else:
-                is_safe = False
-
-            continue
-
-        if is_descending is None:
-            is_descending = diff < 0
-
-        prev_el = curr_el
-        idx += 1
-
-    if is_safe:
-        safe_reports += 1
+    # Check differences based on direction
+    for i in range(len(report) - 1):
+        diff = report[i + 1] - report[i]
+        if direction == "inc":
+            if diff < 1 or diff > 3:
+                return False
+        else:
+            # direction == 'dec'
+            if diff > -1 or diff < -3:
+                return False
+    return True
 
 
-print(safe_reports)
+def is_safe_with_dampener(report):
+    # If already safe
+    if is_safe(report):
+        return True
+
+    # Try removing one element at a time
+    for i in range(len(report)):
+        new_report = report[:i] + report[i + 1 :]
+        if is_safe(new_report):
+            return True
+
+    # If no single removal leads to a safe report
+    return False
+
+
+# Process input
+with open("day_2/input.txt", "r") as f:
+    data = [list(map(int, line.split())) for line in f if line.strip()]
+
+count = 0
+for report in data:
+    if is_safe(report) or is_safe_with_dampener(report):
+        count += 1
+
+print(count)

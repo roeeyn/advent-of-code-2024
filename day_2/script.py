@@ -1,4 +1,4 @@
-with open("./input.txt", "r") as file:
+with open("./day_2/input.txt", "r") as file:
     content = file.read()
 
 reports = [
